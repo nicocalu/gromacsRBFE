@@ -1,0 +1,13 @@
+integrator               = steep
+nsteps                   = 50000
+emtol                    = 1000
+cutoff-scheme            = Verlet
+rcoulomb                 = 1.0
+rvdw                     = 1.0
+coulombtype              = PME
+pme-grid-spacing         = 0.12
+vdwtype                  = PME
+DispCorr                 = no
+constraints              = none
+nstlog                   = 500
+nstenergy                = 500

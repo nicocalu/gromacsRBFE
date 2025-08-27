@@ -1,0 +1,4 @@
+alchemlyb>=1.0
+pymbar>=4.0
+pandas>=2.0
+numpy>=1.24
