@@ -33,11 +33,11 @@ python3 scripts/make_resid_map.py --pdb "$pdb_file" --out resid_map.tsv
 
 # Prepare WT complex system
 echo "Preparing WT complex system..."
-pushd wt_complex > /dev/null
+cd wt_complex
 echo -e "1\n1" | gmx pdb2gmx -f complex.pdb -o conf.gro -p topol.top -ff amber99sb-ildn -water tip3p -ignh &> ../logs/pdb2gmx_complex.log || { echo "Failed at pdb2gmx for complex"; exit 1; }
 gmx editconf -f conf.gro -o box.gro -c -d 1.0 -bt dodecahedron &> ../logs/editconf_complex.log || { echo "Failed at editconf for complex"; exit 1; }
 gmx solvate -cp box.gro -cs spc216.gro -o solv.gro -p topol.top &> ../logs/solvate_complex.log || { echo "Failed at solvate for complex"; exit 1; }
-gmx grompp -f ../mdp/em.mdp -c solv.gro -p topol.top -o ions.tpr -maxwarn 1 &> ../logs/grompp_ions_complex.log || { echo "Failed at grompp for ions"; exit 1; }
+gmx grompp -f ../mdp/em.mdp -c solv.gro -p topol.top -o ions.tpr -maxwarn 2 &> ../logs/grompp_ions_complex.log || { echo "Failed at grompp for ions"; exit 1; }
 echo 13 | gmx genion -s ions.tpr -o solv_ions.gro -p topol.top -neutral &> ../logs/genion_complex.log || { echo "Failed at genion for complex"; exit 1; }
 
 # Minimization and equilibration
@@ -50,11 +50,11 @@ gmx mdrun -v -deffnm npt &> ../logs/mdrun_npt_complex.log || { echo "Failed at m
 
 # Final production structure
 cp npt.gro conf.gro
-popd > /dev/null
+cd ..
 
 # Prepare WT solvent system (nanobody only)
 echo "Preparing WT solvent system..."
-pushd wt_solvent > /dev/null
+cd wt_solvent
 echo -e "1\n1" | gmx pdb2gmx -f nanobody.pdb -o conf.gro -p topol.top -ff amber99sb-ildn -water tip3p -ignh &> ../logs/pdb2gmx_solvent.log || { echo "Failed at pdb2gmx for solvent"; exit 1; }
 gmx editconf -f conf.gro -o box.gro -c -d 1.0 -bt dodecahedron &> ../logs/editconf_solvent.log || { echo "Failed at editconf for solvent"; exit 1; }
 gmx solvate -cp box.gro -cs spc216.gro -o solv.gro -p topol.top &> ../logs/solvate_solvent.log || { echo "Failed at solvate for solvent"; exit 1; }
@@ -71,7 +71,7 @@ gmx mdrun -v -deffnm npt &> ../logs/mdrun_npt_solvent.log || { echo "Failed at m
 
 # Final production structure
 cp npt.gro conf.gro
-popd > /dev/null
+cd ..
 
 # Initialize project structure with lambda windows
 echo "Initializing project structure..."
