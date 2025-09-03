@@ -11,6 +11,10 @@ apt-get update
 apt-get install -y build-essential dkms linux-headers-$(uname -r) git wget curl pv pigz python3.11-venv cmake
 
 cd /tmp
+wget https://github.com/Kitware/CMake/releases/download/v4.1.1/cmake-4.1.1-linux-x86_64.sh
+chmod +x cmake-4.1.1-linux-x86_64.sh
+./cmake-4.1.1-linux-x86_64.sh # yes yes
+ln -s /tmp/cmake-4.1.1-linux-x86_64/bin/* /usr/bin
 
 # Install NVIDIA driver from CUDA repo
 wget -q https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb
@@ -54,7 +58,11 @@ export CUDA_HOME="$NVHPC/Linux_x86_64/25.7/cuda/12.9"
 EOF
 chmod +x /etc/profile.d/hpcsdk.sh
 # Load env in current shell
+set +e
+set +u
 source /etc/profile.d/hpcsdk.sh
+set -e
+set -u
 
 # GROMACS
 wget -q ftp://ftp.gromacs.org/gromacs/gromacs-2025.2.tar.gz
@@ -74,10 +82,13 @@ make -j"$(nproc)"
 make check -j"$(nproc)"
 make install
 
-source /tmp/gromacs/bin/GMXRC
 echo 'source /tmp/gromacs/bin/GMXRC' >> /etc/profile.d/gromacs.sh
 chmod +x /etc/profile.d/gromacs.sh
+set +e
+set +u
 source /tmp/gromacs/bin/GMXRC
+set -e
+set -u
 
 echo "GROMACS installed. Open a new shell or 'source /etc/profile' to load env."
 
