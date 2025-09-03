@@ -8,13 +8,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 apt-get update
-apt-get install -y build-essential dkms linux-headers-$(uname -r) git wget curl pv pigz python3.11-venv
+apt-get install -y build-essential dkms linux-headers-$(uname -r) git wget curl pv pigz python3.11-venv cmake
 
 cd /tmp
-wget https://github.com/Kitware/CMake/releases/download/v4.1.1/cmake-4.1.1-linux-x86_64.sh
-chmod +x cmake-4.1.1-linux-x86_64.sh
-./cmake-4.1.1-linux-x86_64.sh # yes yes
-ln -s /tmp/cmake-4.1.1-linux-x86_64/bin/* /usr/bin
 
 # Install NVIDIA driver from CUDA repo
 wget -q https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb
@@ -38,7 +34,7 @@ nvidia-smi || { echo "Driver not loaded. Check Secure Boot or logs."; exit 1; }
 cd /tmp
 
 # NVIDIA HPC SDK
-wget -q https://developer.download.nvidia.com/hpc-sdk/25.7/nvhpc_2025_257_Linux_x86_64_cuda_12.9.tar.gz
+wget https://developer.download.nvidia.com/hpc-sdk/25.7/nvhpc_2025_257_Linux_x86_64_cuda_12.9.tar.gz
 pv nvhpc_2025_257_Linux_x86_64_cuda_12.9.tar.gz | pigz -dc -p8 | tar -xf -
 
 ./nvhpc_2025_257_Linux_x86_64_cuda_12.9/install
@@ -52,7 +48,7 @@ export NVHPC=/tmp/nvidia/hpc_sdk
 export HPCSDK="$NVHPC"
 export PATH="$NVHPC/Linux_x86_64/25.7/compilers/bin:$NVHPC/Linux_x86_64/25.7/cuda/12.9/bin:$PATH"
 # Ensure defined under 'set -u'
-: "${LD_LIBRARY_PATH:=}"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
 export LD_LIBRARY_PATH="$NVHPC/Linux_x86_64/25.7/compilers/lib:$NVHPC/Linux_x86_64/25.7/cuda/12.9/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export CUDA_HOME="$NVHPC/Linux_x86_64/25.7/cuda/12.9"
 EOF
